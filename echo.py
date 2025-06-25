@@ -23,8 +23,6 @@ def get_user_fullname(user: User) -> str:
         getattr(user, "username"),
     ]
 
-    print(user_data)
-
     return ", ".join([str(ud) for ud in user_data if (ud is not None and ud != "")])
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -41,13 +39,10 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     query = update.callback_query
     await query.answer()  # Обязательно вызываем answer()
     
-    # Получаем ответ по callback_data
     response = BUTTON_RESPONSES[query.data]
     
-    # Редактируем исходное сообщение (не создаем новое)
     await query.edit_message_text(text=response)
     
-    # Логируем в консоль
     print(f"Нажата кнопка \"{USER_CHOICE_MAP[query.data]}\"")
     USER_CHOICE = USER_CHOICE_MAP[query.data]
 
@@ -71,7 +66,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     print(f"{user}: {user_message}")
 
-    # Обработка кнопки завершения
     if user_message == EXIT_BUTTON_TEXT:
         context.user_data.clear()
 
