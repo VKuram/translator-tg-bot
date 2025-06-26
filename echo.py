@@ -55,6 +55,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
     if user_message == EXIT_BUTTON_TEXT:
         context.user_data.clear()
+        try:
+            await context.bot.delete_message(
+                chat_id=update.effective_chat.id,
+                message_id=update.message.message_id
+            )
+        except Exception as e:
+            print(f"Ошибка при удалении: {e}")
 
         keyboard = START_INLINE_KEYBOARD
         reply_markup = InlineKeyboardMarkup(keyboard)
