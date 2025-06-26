@@ -47,10 +47,17 @@ def load_user_cache(user_id: str) -> list:
         return json.loads(row[0])
     return []
 
-def delete_user_cache(user_id):
-    conn = sqlite3.connect(db_file_path)
+def delete_user_cache(user_id: str):
+    conn = sqlite3.connect('cache.db')
     cursor = conn.cursor()
-    
+
+    cursor.execute("SELECT name FROM sqlite_master WHERE type='table' AND name='cache'")
+    table_exists = cursor.fetchone()
+
+    if not table_exists:
+        conn.close()
+        return
+
     cursor.execute('DELETE FROM cache WHERE id = ?', (user_id,))
     conn.commit()
     conn.close()
