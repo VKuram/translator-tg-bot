@@ -24,7 +24,7 @@ START_INLINE_KEYBOARD = [
 MODELS_INLINE_KEYBOARD = [
     [
         InlineKeyboardButton(model_name, callback_data=model_name) for model_name in AI_MODELS.keys()
-    ] 
+    ]
 ]
 
 BUTTON_RESPONSES = {

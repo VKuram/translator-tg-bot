@@ -15,21 +15,6 @@ load_dotenv()
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
-async def send_thinking_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Отправляет временное сообщение и возвращает его ID"""
-    message = await update.message.reply_text("⏳ Подожди, думаю...")
-    return message.message_id
-
-async def delete_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message_id: int):
-    """Удаляет сообщение с указанным ID"""
-    try:
-        await context.bot.delete_message(
-            chat_id=update.effective_chat.id,
-            message_id=message_id
-        )
-    except Exception as e:
-        print(f"Не удалось удалить сообщение: {e}")
-
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(START_INLINE_KEYBOARD)
     await update.message.reply_text(
@@ -46,7 +31,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["model_selected"] = True
         context.user_data["selected_model"] = query.data
 
-        await query.edit_message_text(text=f"Выбрана модель: {query.data}." + "\n" + BUTTON_RESPONSES.get(GPT_GUID))
+        await query.edit_message_text(text=f"Выбрана модель: {query.data}" + "\n" + BUTTON_RESPONSES.get(GPT_GUID))
 
     user_choice = USER_CHOICE_MAP.get(query.data)
 
@@ -101,8 +86,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             user_messages = load_user_cache(user_id)
 
-            thinking_messsage_id = await send_thinking_message(update, context)
-
             if not user_messages:
                 user_messages = [
                     {
@@ -118,35 +101,32 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             )
 
             ai_model = get_ai_model(context.user_data.get("selected_model"))
-            ai_response = get_ai_response(user_messages, ai_model)
+            ai_response = await get_ai_response(update, context, user_messages, ai_model)
 
             user_messages.append(
                 {
                     "role": "assistant",
                     "content": ai_response,
-                },            
+                },
             )
 
             save_user_cache(user_id, user_messages)
 
             ai_response = get_formatted_ai_response(ai_response)
-            
-            await delete_message(update, context, thinking_messsage_id)
 
         print(f"bot: {ai_response}")
         try:
             await update.message.reply_markdown(ai_response, reply_markup=EXIT_KEYBOARD)
         except:
             await update.message.reply_text(ai_response, reply_markup=EXIT_KEYBOARD)
-            
 
 def main():
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
-    
+
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_handler))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
-    
+
     print("Бот запущен")
     application.run_polling()
 

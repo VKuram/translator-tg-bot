@@ -1,5 +1,9 @@
-from dotenv import load_dotenv
+import asyncio
 import os
+
+from dotenv import load_dotenv
+from telegram import Update
+from telegram.ext import ContextTypes
 from together import Together
 
 load_dotenv()
@@ -30,25 +34,67 @@ END_WORDS = ["</think>"]
 
 client = Together(api_key=TOGETHER_API_KEY, base_url=API_URL, max_retries=5)
 
-def get_ai_response(
+async def get_ai_response(
+    update: Update,
+    context: ContextTypes.DEFAULT_TYPE,
     messages: list[dict[str, str]],
     ai_model: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
 ) -> str:
+    stop_animation = asyncio.Event()
+
+    loading_message = await context.bot.send_message(
+        chat_id=update.effective_chat.id,
+        text="Подожди, думаю... "
+    )
+
+    async def send_loading_message():
+        spinner = ["🕛", "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚"]
+        while not stop_animation.is_set():
+            for frame in spinner:
+                if stop_animation.is_set():
+                    break
+                try:
+                    await context.bot.edit_message_text(
+                        chat_id=update.effective_chat.id,
+                        message_id=loading_message.message_id,
+                        text=f"Подожди, думаю... {frame}"
+                    )
+                    await asyncio.sleep(0.15)
+                except:
+                    break
+
+    loading_task = asyncio.create_task(send_loading_message())
+
     try:
-        client_response = client.chat.completions.create(
+        loop = asyncio.get_event_loop()
+        client_response = await loop.run_in_executor(None, lambda: client.chat.completions.create(
             model=ai_model,
             messages=messages,
-        )
+        ))
 
         text_response = client_response.choices[0].message.content
 
         print(f"AI: {text_response}")
 
+        stop_animation.set()
+        await loading_task
+        await loading_message.delete()
+
         return text_response
 
     except Exception as e:
+        context.user_data["ai_response_received"] = True
+
         print(e)
-        return "Что-то пошло не так, попробуй еще раз"
+        await loading_message.edit_text("Произошла ошибка при обработке запроса")
+
+        return ""
+
+    finally:
+        # 9. Гарантированная очистка
+        stop_animation.set()
+        if not loading_task.done():
+            loading_task.cancel()
 
 def get_formatted_ai_response(text_response: str) -> str:
     for end_word in END_WORDS:
