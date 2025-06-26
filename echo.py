@@ -40,7 +40,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
             reply_markup = InlineKeyboardMarkup(MODELS_INLINE_KEYBOARD)
 
             await query.edit_message_text(
-                "Выбери модель AI:",
+                "Выбери модель AI 🦾",
                 reply_markup=reply_markup
             )
 
