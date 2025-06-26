@@ -46,7 +46,7 @@ async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
         context.user_data["model_selected"] = True
         context.user_data["selected_model"] = query.data
 
-        await query.edit_message_text(text=f"Выбрана модель: {query.data}. " + BUTTON_RESPONSES.get(GPT_GUID))
+        await query.edit_message_text(text=f"Выбрана модель: {query.data}." + "\n" + BUTTON_RESPONSES.get(GPT_GUID))
 
     user_choice = USER_CHOICE_MAP.get(query.data)
 
@@ -145,7 +145,6 @@ def main():
     
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_handler))
-    # application.add_handler(CallbackQueryHandler(model_choice_callback))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
     print("Бот запущен")
