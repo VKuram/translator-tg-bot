@@ -16,6 +16,21 @@ load_dotenv()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 USER_CHOICE = None
 
+async def send_thinking_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Отправляет временное сообщение и возвращает его ID"""
+    message = await update.message.reply_text("⏳ Подожди, думаю...")
+    return message.message_id
+
+async def delete_message(update: Update, context: ContextTypes.DEFAULT_TYPE, message_id: int):
+    """Удаляет сообщение с указанным ID"""
+    try:
+        await context.bot.delete_message(
+            chat_id=update.effective_chat.id,
+            message_id=message_id
+        )
+    except Exception as e:
+        print(f"Не удалось удалить сообщение: {e}")
+
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = INLINE_KEYBOARD
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -80,7 +95,11 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
         elif USER_CHOICE == GPT_TEXT:
             init_db()
+
             user_messages = load_user_cache(user_id)
+
+            thinking_messsage_id = await send_thinking_message(update, context)
+
             if not user_messages:
                 user_messages = [
                     {
@@ -107,6 +126,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             save_user_cache(user_id, user_messages)
 
             ai_response = get_formatted_ai_response(ai_response)
+            
+            await delete_message(update, context, thinking_messsage_id)
 
         print(f"bot: {ai_response}")
         await update.message.reply_markdown(ai_response, reply_markup=EXIT_KEYBOARD)
