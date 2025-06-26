@@ -54,4 +54,3 @@ def delete_user_cache(user_id):
     cursor.execute('DELETE FROM cache WHERE id = ?', (user_id,))
     conn.commit()
     conn.close()
-
