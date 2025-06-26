@@ -5,7 +5,7 @@ from telegram.ext import ContextTypes
 from together import Together
 
 from messages import *
-from constants import API_URL, AI_MODELS, END_WORDS, ERROR_TEXT, TOGETHER_API_KEY
+from constants import API_URL, AI_MODELS, END_WORDS, ERROR_MESSAGE, TOGETHER_API_KEY
 
 client = Together(api_key=TOGETHER_API_KEY, base_url=API_URL, max_retries=5)
 
@@ -40,7 +40,7 @@ async def get_ai_response(
 
         print(e)
 
-        return ERROR_TEXT
+        return ERROR_MESSAGE
 
     finally:
         stop_animation.set()

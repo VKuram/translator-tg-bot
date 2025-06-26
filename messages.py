@@ -10,7 +10,9 @@ async def send_loading_message(update: Update, context: ContextTypes.DEFAULT_TYP
         chat_id=update.effective_chat.id,
         text="Подожди, думаю... "
     )
+
     spinner = ["🕛", "🕐", "🕑", "🕒", "🕓", "🕔", "🕕", "🕖", "🕗", "🕘", "🕙", "🕚"]
+
     while not stop_animation.is_set():
         for frame in spinner:
             if stop_animation.is_set():
@@ -26,3 +28,5 @@ async def send_loading_message(update: Update, context: ContextTypes.DEFAULT_TYP
             except:
                 await loading_message.delete()
                 break
+
+    loading_message.delete()
