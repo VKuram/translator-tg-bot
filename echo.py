@@ -2,28 +2,19 @@ import os
 
 from dotenv import load_dotenv
 
-from telegram import Update, InlineKeyboardMarkup, User
+from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 
 from ai_functions import *
 from keyboard import *
 from language_detector import *
 from translator import *
+from user_data import *
 
 load_dotenv()
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 USER_CHOICE = None
-
-def get_user_fullname(user: User) -> str:
-    user_data = [
-        getattr(user, "id"),
-        getattr(user, "first_name"),
-        getattr(user, "last_name"),
-        getattr(user, "username"),
-    ]
-
-    return ", ".join([str(ud) for ud in user_data if (ud is not None and ud != "")])
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     keyboard = INLINE_KEYBOARD
@@ -62,9 +53,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     global USER_CHOICE
     user_message = update.message.text
     print(update.message.from_user)
-    user = get_user_fullname(update.message.from_user)
+    user_data = get_user_fullname(update.message.from_user)
+    user_id = getattr(update.message.from_user, "id")
 
-    print(f"{user}: {user_message}")
+    print(f"{user_data}: {user_message}")
 
     if user_message == EXIT_BUTTON_TEXT:
         context.user_data.clear()
@@ -72,6 +64,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         keyboard = INLINE_KEYBOARD
         reply_markup = InlineKeyboardMarkup(keyboard)
         USER_CHOICE == None
+        delete_user_cache(user_id)
         await update.message.reply_text(
             "Выбери действие 💬",
             reply_markup=reply_markup
@@ -81,26 +74,40 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         if USER_CHOICE == TRANSLATE_TEXT:
             target_language, source_language = detect_language(user_message)
             if target_language and source_language:
-                response = translate_text(user_message, target_language, source_language)
+                ai_response = translate_text(user_message, target_language, source_language)
             else:
                 await update.message.reply_text(ERROR_TEXT, reply_markup=EXIT_KEYBOARD)
 
         elif USER_CHOICE == GPT_TEXT:
-            messages_to_ai = [
-                {
-                    "role": "system",
-                    "content": SYSTEM_PROMPT,
-                },
+            init_db()
+            user_messages = load_user_cache(user_id)
+            if not user_messages:
+                user_messages = [
+                    {
+                        "role": "system",
+                        "content": SYSTEM_PROMPT,
+                    },
+                ]
+            user_messages.append(
                 {
                     "role": "user",
                     "content": user_message,
                 },
-            ]
+            )
 
-            response = get_ai_response(messages_to_ai)
+            ai_response = get_ai_response(user_messages)
 
-        print(f"bot: {response}")
-        await update.message.reply_markdown(response, reply_markup=EXIT_KEYBOARD)
+            user_messages.append(
+                {
+                    "role": "assistant",
+                    "content": ai_response,
+                },            
+            )
+
+            save_user_cache(user_id, user_messages)
+
+        print(f"bot: {ai_response}")
+        await update.message.reply_markdown(ai_response, reply_markup=EXIT_KEYBOARD)
 
 def main():
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()

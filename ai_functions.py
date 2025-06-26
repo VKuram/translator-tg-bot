@@ -23,7 +23,7 @@ SYSTEM_PROMPT = (
 
 END_WORDS = ["</think>"]
 
-client = Together(api_key=TOGETHER_API_KEY, base_url=API_URL, max_retries=1)
+client = Together(api_key=TOGETHER_API_KEY, base_url=API_URL, max_retries=5)
 
 def get_ai_response(messages) -> str:
     try:
@@ -36,11 +36,15 @@ def get_ai_response(messages) -> str:
 
         print(f"AI: {text_response}")
 
-        for end_word in END_WORDS:
-            if end_word in text_response:
-                text_response = text_response.split(end_word)[-1]
-
         return text_response
+
     except Exception as e:
         print(e)
-        return "Что-то поломалось"
+        return "Что-то пошло не так, попробуй еще раз"
+
+def format_ai_response(text_response: str) -> str:
+    for end_word in END_WORDS:
+        if end_word in text_response:
+            text_response = text_response.split(end_word)[-1]
+
+    return text_response.replace("<think>", "")
