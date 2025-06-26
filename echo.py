@@ -106,6 +106,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             save_user_cache(user_id, user_messages)
 
+            ai_response = get_formatted_ai_response(ai_response)
+
         print(f"bot: {ai_response}")
         await update.message.reply_markdown(ai_response, reply_markup=EXIT_KEYBOARD)
 

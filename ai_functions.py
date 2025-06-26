@@ -42,7 +42,7 @@ def get_ai_response(messages) -> str:
         print(e)
         return "Что-то пошло не так, попробуй еще раз"
 
-def format_ai_response(text_response: str) -> str:
+def get_formatted_ai_response(text_response: str) -> str:
     for end_word in END_WORDS:
         if end_word in text_response:
             text_response = text_response.split(end_word)[-1]
