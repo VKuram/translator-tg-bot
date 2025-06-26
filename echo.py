@@ -14,7 +14,6 @@ from user_data import *
 load_dotenv()
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
-USER_CHOICE = None
 
 async def send_thinking_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Отправляет временное сообщение и возвращает его ID"""
@@ -32,8 +31,7 @@ async def delete_message(update: Update, context: ContextTypes.DEFAULT_TYPE, mes
         print(f"Не удалось удалить сообщение: {e}")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    keyboard = INLINE_KEYBOARD
-    reply_markup = InlineKeyboardMarkup(keyboard)
+    reply_markup = InlineKeyboardMarkup(START_INLINE_KEYBOARD)
     await update.message.reply_text(
         "Выбери действие 💬",
         reply_markup=reply_markup
@@ -41,33 +39,37 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 async def button_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обрабатываем нажатие Inline-кнопки"""
-    global USER_CHOICE
     query = update.callback_query
-    await query.answer()  # Обязательно вызываем answer()
-    
-    response = BUTTON_RESPONSES[query.data]
-    
-    await query.edit_message_text(text=response)
-    
-    print(f"Нажата кнопка \"{USER_CHOICE_MAP[query.data]}\"")
-    USER_CHOICE = USER_CHOICE_MAP[query.data]
+    await query.answer()
 
-    if USER_CHOICE == TRANSLATE_TEXT:
-        await update.message.reply_text(
-            BUTTON_RESPONSES[TRANSLATE_GUID],
-            reply_markup=EXIT_KEYBOARD
-        )
-    elif USER_CHOICE == GPT_TEXT:
-        await update.message.reply_text(
-            BUTTON_RESPONSES[GPT_GUID],
-            reply_markup=EXIT_KEYBOARD
-        )
+    if query.data in AI_MODELS.keys():
+        context.user_data["model_selected"] = True
+        context.user_data["selected_model"] = query.data
+
+        await query.edit_message_text(text=f"Выбрана модель: {query.data}. " + BUTTON_RESPONSES.get(GPT_GUID))
+
+    user_choice = USER_CHOICE_MAP.get(query.data)
+
+    if user_choice:
+        print(f"Нажата кнопка \"{user_choice}\"")
+        context.user_data["user_choice"] = user_choice
+
+    if context.user_data["user_choice"] == TRANSLATE_TEXT:
+        await query.edit_message_text(text=BUTTON_RESPONSES[query.data])
+
+    if context.user_data["user_choice"] == GPT_TEXT and not context.user_data.get("model_selected"):
+        if not context.user_data.get("model_selected"):
+            reply_markup = InlineKeyboardMarkup(MODELS_INLINE_KEYBOARD)
+
+            await query.edit_message_text(
+                "Выбери модель AI:",
+                reply_markup=reply_markup
+            )
 
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Обрабатываем обычные текстовые сообщения"""
-    global USER_CHOICE
+
     user_message = update.message.text
-    print(update.message.from_user)
     user_data = get_user_fullname(update.message.from_user)
     user_id = getattr(update.message.from_user, "id")
 
@@ -76,9 +78,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if user_message == EXIT_BUTTON_TEXT:
         context.user_data.clear()
 
-        keyboard = INLINE_KEYBOARD
+        keyboard = START_INLINE_KEYBOARD
         reply_markup = InlineKeyboardMarkup(keyboard)
-        USER_CHOICE == None
+        context.user_data["user_choice"] = None
+        context.user_data["model_selected"] = False
         delete_user_cache(user_id)
         await update.message.reply_text(
             "Выбери действие 💬",
@@ -86,14 +89,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         )
 
     else:
-        if USER_CHOICE == TRANSLATE_TEXT:
+        if context.user_data["user_choice"] == TRANSLATE_TEXT:
             target_language, source_language = detect_language(user_message)
             if target_language and source_language:
                 ai_response = translate_text(user_message, target_language, source_language)
             else:
                 await update.message.reply_text(ERROR_TEXT, reply_markup=EXIT_KEYBOARD)
 
-        elif USER_CHOICE == GPT_TEXT:
+        elif context.user_data["user_choice"] == GPT_TEXT:
             init_db()
 
             user_messages = load_user_cache(user_id)
@@ -114,7 +117,8 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 },
             )
 
-            ai_response = get_ai_response(user_messages)
+            ai_model = get_ai_model(context.user_data.get("selected_model"))
+            ai_response = get_ai_response(user_messages, ai_model)
 
             user_messages.append(
                 {
@@ -130,17 +134,22 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
             await delete_message(update, context, thinking_messsage_id)
 
         print(f"bot: {ai_response}")
-        await update.message.reply_markdown(ai_response, reply_markup=EXIT_KEYBOARD)
+        try:
+            await update.message.reply_markdown(ai_response, reply_markup=EXIT_KEYBOARD)
+        except:
+            await update.message.reply_text(ai_response, reply_markup=EXIT_KEYBOARD)
+            
 
 def main():
     application = Application.builder().token(TELEGRAM_BOT_TOKEN).build()
     
     application.add_handler(CommandHandler("start", start))
     application.add_handler(CallbackQueryHandler(button_handler))
+    # application.add_handler(CallbackQueryHandler(model_choice_callback))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
     print("Бот запущен")
     application.run_polling()
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

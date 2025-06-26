@@ -1,6 +1,6 @@
 def _detect_language_balance(text: str) -> tuple[str]:
-    en_count = sum(1 for char in text if 'a' <= char <= 'z' or 'A' <= char <= 'Z')
-    ru_count = sum(1 for char in text if 'а' <= char <= 'я' or 'А' <= char <= 'Я' or char in 'ёЁ')
+    en_count = sum(1 for char in text if "a" <= char <= "z" or "A" <= char <= "Z")
+    ru_count = sum(1 for char in text if "а" <= char <= "я" or "А" <= char <= "Я" or char in "ёЁ")
 
     if (en_count + ru_count) == 0:
         return None, None

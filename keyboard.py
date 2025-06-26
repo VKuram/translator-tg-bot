@@ -1,6 +1,7 @@
 from telegram import InlineKeyboardButton, ReplyKeyboardMarkup
 
 from guid_generator import get_guid_from_value
+from ai_functions import AI_MODELS
 
 EXIT_BUTTON_TEXT = "❌ Завершить ❌"
 TRANSLATE_TEXT = "Переводчик"
@@ -14,12 +15,17 @@ USER_CHOICE_MAP = {
 }
 
 EXIT_KEYBOARD = ReplyKeyboardMarkup([[EXIT_BUTTON_TEXT]], resize_keyboard=True)
-INLINE_KEYBOARD = [
-        [
-            InlineKeyboardButton(TRANSLATE_TEXT, callback_data=TRANSLATE_GUID),
-            InlineKeyboardButton(GPT_TEXT, callback_data=GPT_GUID)
-        ]
+START_INLINE_KEYBOARD = [
+    [
+        InlineKeyboardButton(TRANSLATE_TEXT, callback_data=TRANSLATE_GUID),
+        InlineKeyboardButton(GPT_TEXT, callback_data=GPT_GUID)
     ]
+]
+MODELS_INLINE_KEYBOARD = [
+    [
+        InlineKeyboardButton(model_name, callback_data=model_name) for model_name in AI_MODELS.keys()
+    ] 
+]
 
 BUTTON_RESPONSES = {
     TRANSLATE_GUID: "Введи текст, который необходимо перевести",

@@ -6,7 +6,12 @@ load_dotenv()
 
 API_URL = "https://api.together.xyz/v1"
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-AI_MODEL = os.getenv("AI_MODEL")
+AI_MODELS = {
+    "DeepSeek": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+    "Meta Vision": "meta-llama/Llama-Vision-Free",
+    "Meta 3.3": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
+    "Arcee AFM": "arcee-ai/AFM-4.5B-Preview",
+}
 
 SYSTEM_PROMPT = (
 "Тебе будут поступать разные вопросы, или просто пользователь захочет что-то написать. Есть несколько правил: \n"
@@ -25,10 +30,13 @@ END_WORDS = ["</think>"]
 
 client = Together(api_key=TOGETHER_API_KEY, base_url=API_URL, max_retries=5)
 
-def get_ai_response(messages) -> str:
+def get_ai_response(
+    messages: list[dict[str, str]],
+    ai_model: str = "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
+) -> str:
     try:
         client_response = client.chat.completions.create(
-            model=AI_MODEL,
+            model=ai_model,
             messages=messages,
         )
 
@@ -48,3 +56,6 @@ def get_formatted_ai_response(text_response: str) -> str:
             text_response = text_response.split(end_word)[-1]
 
     return text_response.replace("<think>", "")
+
+def get_ai_model(model_name: str) -> str:
+    return AI_MODELS.get(model_name)
