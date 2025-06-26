@@ -1,19 +1,12 @@
-import os
-
-from dotenv import load_dotenv
-
 from telegram import Update, InlineKeyboardMarkup
 from telegram.ext import Application, CommandHandler, MessageHandler, filters, ContextTypes, CallbackQueryHandler
 
 from ai_functions import *
+from constants import BUTTON_RESPONSES, ERROR_TEXT, SYSTEM_PROMPT, TELEGRAM_BOT_TOKEN, USER_CHOICE_MAP
 from keyboard import *
 from language_detector import *
 from translator import *
 from user_data import *
-
-load_dotenv()
-
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
     reply_markup = InlineKeyboardMarkup(START_INLINE_KEYBOARD)
