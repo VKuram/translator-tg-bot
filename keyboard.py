@@ -3,7 +3,7 @@ from telegram import InlineKeyboardButton, ReplyKeyboardMarkup
 from guid_generator import get_guid_from_value
 from ai_functions import AI_MODELS
 
-EXIT_BUTTON_TEXT = "❌ Завершить ❌"
+EXIT_BUTTON_TEXT = " == Выход 🔌 == "
 TRANSLATE_TEXT = "Переводчик"
 GPT_TEXT = "Чат-бот"
 TRANSLATE_GUID = get_guid_from_value(TRANSLATE_TEXT)
