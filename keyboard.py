@@ -2,7 +2,7 @@ from telegram import InlineKeyboardButton, ReplyKeyboardMarkup
 
 from ai_functions import AI_MODELS
 
-from constants import EXIT_BUTTON_TEXT, TRANSLATE_TEXT, GPT_TEXT, TRANSLATE_GUID, GPT_GUID
+from constants import EXIT_BUTTON_TEXT, GPT_GUID, GPT_TEXT, TRANSLATE_GUID, TRANSLATE_TEXT
 
 EXIT_KEYBOARD = ReplyKeyboardMarkup([[EXIT_BUTTON_TEXT]], resize_keyboard=True)
 START_INLINE_KEYBOARD = [
