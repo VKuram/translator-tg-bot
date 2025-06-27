@@ -63,5 +63,4 @@ async def send_loading_message(update: Update, context: ContextTypes.DEFAULT_TYP
                 )
                 await asyncio.sleep(0.15)
             except:
-                await loading_message.delete()
                 break
