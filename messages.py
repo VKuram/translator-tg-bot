@@ -37,8 +37,7 @@ async def reply_text_message(update: Update, context: ContextTypes.DEFAULT_TYPE,
 async def reply_error_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Отправка сообщения об ошибке"""
     await update.message.reply_text(
-        ERROR_MESSAGE + "\n" + START_MESSAGE,
-        reply_markup=START_INLINE_KEYBOARD,
+        ERROR_MESSAGE,
     )
 
 async def send_loading_message(update: Update, context: ContextTypes.DEFAULT_TYPE, stop_animation: asyncio.Event):

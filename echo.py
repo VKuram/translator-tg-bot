@@ -119,6 +119,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             if ai_response == ERROR_MESSAGE:
                 await reply_error_message(update, context)
+                
+                context.user_data["user_choice"] = None  # Очистка выбора
+                context.user_data["model_selected"] = False  # Очистка модели
+
+                delete_user_cache(user_id)  # Очистка кэша
+
+                await reply_start_message(update, context)
             else:
                 messages_log.append(get_ai_message_log(ai_response))
 

@@ -10,7 +10,7 @@ API_URL = "https://api.together.xyz/v1"
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
 AI_MODELS_MAP = {
     "DeepSeek": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
-    "Meta Vision": "meta-llama/Llama-Vision-Free",
+    # "Meta Vision": "meta-llama/Llama-Vision-Free",
     "Meta 3.3": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
     "Arcee AFM": "arcee-ai/AFM-4.5B-Preview",
 }
