@@ -4,7 +4,7 @@ from ai_functions import AI_MODELS_MAP
 
 from constants import EXIT_BUTTON_TEXT, GPT_GUID, GPT_TEXT, TRANSLATE_GUID, TRANSLATE_TEXT
 
-EXIT_KEYBOARD = ReplyKeyboardMarkup([[EXIT_BUTTON_TEXT]], resize_keyboard=True)  # Кнопка завершения
+EXIT_KEYBOARD = ReplyKeyboardMarkup([[EXIT_BUTTON_TEXT]], resize_keyboard=True, one_time_keyboard=True)  # Кнопка завершения
 
 START_INLINE_KEYBOARD = InlineKeyboardMarkup([
     [
