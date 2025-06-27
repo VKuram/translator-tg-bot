@@ -32,7 +32,7 @@ END_WORDS = ["</think>"]
 
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")  # Токен телеграм-бота
 
-EXIT_BUTTON_TEXT = "Завершение работы, перезапуск бота 🔌\u200B"  # Кнопка завершения
+EXIT_BUTTON_TEXT = "Завершение работы, перезапуск бота 🔌"  # Кнопка завершения
 TRANSLATE_TEXT = "Переводчик"
 GPT_TEXT = "Чат-бот"
 
