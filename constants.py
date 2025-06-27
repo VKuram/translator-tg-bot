@@ -8,7 +8,7 @@ load_dotenv()
 
 API_URL = "https://api.together.xyz/v1"
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-AI_MODELS = {
+AI_MODELS_MAP = {
     "DeepSeek": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
     "Meta Vision": "meta-llama/Llama-Vision-Free",
     "Meta 3.3": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
@@ -30,9 +30,9 @@ SYSTEM_PROMPT = (
 
 END_WORDS = ["</think>"]
 
-TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")  # Токен телеграм-бота
 
-EXIT_BUTTON_TEXT = "-    Выход 🔌    -"
+EXIT_BUTTON_TEXT = "...    Завершение  🔌    ..."  # Кнопка завершения
 TRANSLATE_TEXT = "Переводчик"
 GPT_TEXT = "Чат-бот"
 
@@ -47,7 +47,7 @@ BUTTON_RESPONSES = {
 START_MESSAGE = "Выбери действие 💬"
 ERROR_MESSAGE = "Что-то неразборчивое, попробуй снова 🤖"
 
-USER_CHOICE_MAP = {
+START_CHOICE_MAP = {
     TRANSLATE_GUID: TRANSLATE_TEXT,
     GPT_GUID: GPT_TEXT,
 }

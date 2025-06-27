@@ -4,17 +4,20 @@ import json
 
 db_file_path = "cache.db"
 
-def get_user_fullname(user: User) -> str:
-    user_data = [
-        getattr(user, "id"),
-        getattr(user, "first_name"),
-        getattr(user, "last_name"),
-        getattr(user, "username"),
-    ]
+def get_user_full_name(user: User) -> str:
+    """Форматирует данные пользователя в Markdown-список."""
+    user_data_types = ["id", "first_name", "last_name", "username", "language_code", "is_premium"]
+    user_data = []
 
-    return ", ".join([str(ud) for ud in user_data if (ud is not None and ud != "")])
+    for data_type in user_data_types:
+        value = getattr(user, data_type, None)
+        if value:
+            user_data.append(f"`{data_type}`: `{value}`")  # Моноширинный вывод
+
+    return "\n".join(user_data) if user_data else "Нет данных о пользователе."
 
 def init_db():
+    """Инициализация БД с кэшем диалога с чат-ботом"""
     conn = sqlite3.connect(db_file_path)
     cursor = conn.cursor()
     cursor.execute("""
@@ -27,6 +30,7 @@ def init_db():
     conn.close()
 
 def save_user_cache(user_id: str, user_messages: list):
+    """Сохранение диалога в БД с кэшем"""
     conn = sqlite3.connect(db_file_path)
     cursor = conn.cursor()
     serialized = json.dumps(user_messages)  # сериализуем список словарей в строку
@@ -38,6 +42,7 @@ def save_user_cache(user_id: str, user_messages: list):
     conn.close()
 
 def load_user_cache(user_id: str) -> list:
+    """Чтение диалога из БД с кэшем"""
     conn = sqlite3.connect(db_file_path)
     cursor = conn.cursor()
     cursor.execute("SELECT messages FROM cache WHERE id = ?", (user_id,))
@@ -48,6 +53,7 @@ def load_user_cache(user_id: str) -> list:
     return []
 
 def delete_user_cache(user_id: str):
+    """Удаление кэша диалога"""
     conn = sqlite3.connect(db_file_path)
     cursor = conn.cursor()
 

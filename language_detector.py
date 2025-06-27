@@ -1,15 +1,14 @@
 def _detect_language_balance(text: str) -> tuple[str]:
-    en_count = sum(1 for char in text if "a" <= char <= "z" or "A" <= char <= "Z")
-    ru_count = sum(1 for char in text if "а" <= char <= "я" or "А" <= char <= "Я" or char in "ёЁ")
+    en_count = sum(1 for char in text.lower() if "a" <= char <= "z")
+    ru_count = sum(1 for char in text.lower() if "а" <= char <= "я" or char == "ё")
 
-    if (en_count == ru_count) or ((en_count + ru_count) == 0):
+    if ru_count > en_count:
+        return "auto", "en"
+    else:
         return "auto", "ru"
-    elif en_count > ru_count:
-        return "ru", "en"
-    elif ru_count > en_count:
-        return "en", "ru"
 
 def detect_language(text: str) -> tuple[str]:
+    """Определение, с какого на какой язык требуется перевод"""
     if not isinstance(text, str):
         return None, None
     en_chars = set("abcdefghijklmnopqrstuvwxyz")
@@ -18,9 +17,7 @@ def detect_language(text: str) -> tuple[str]:
     has_en = any(char in en_chars for char in text.lower())
     has_ru = any(char in ru_chars for char in text.lower())
 
-    if has_en and not has_ru:
-        return "ru", "en"
-    elif has_ru and not has_en:
-        return "en", "ru"
+    if has_ru and not has_en:
+        return "auto", "en"
     else:
         return _detect_language_balance(text.lower())  # Смешанный текст
