@@ -65,5 +65,3 @@ async def send_loading_message(update: Update, context: ContextTypes.DEFAULT_TYP
             except:
                 await loading_message.delete()
                 break
-
-    loading_message.delete()
