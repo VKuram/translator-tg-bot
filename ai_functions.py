@@ -73,7 +73,7 @@ def get_user_message_log(message_text: str)-> dict[str, str]:
         "role": "user",
         "content": message_text,
     }
-    
+
 def get_ai_message_log(message_text: str)-> dict[str, str]:
     """Получение лога сообщения AI"""
     return {

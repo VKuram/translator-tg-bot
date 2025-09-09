@@ -9,7 +9,7 @@ from keyboard import START_INLINE_KEYBOARD, EXIT_KEYBOARD, MODELS_INLINE_KEYBOAR
 async def reply_start_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Вывод Inline-кнопки выбора начального действия"""
     await update.message.reply_text(
-        START_MESSAGE, 
+        START_MESSAGE,
         reply_markup=START_INLINE_KEYBOARD,
     )
 

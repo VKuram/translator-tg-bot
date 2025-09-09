@@ -4,9 +4,9 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 from ai_functions import (
     get_ai_message_log,
     get_ai_model,
-    get_ai_response, 
+    get_ai_response,
     get_formatted_ai_response,
-    get_prompt_message_log, 
+    get_prompt_message_log,
     get_user_message_log,
 )
 from constants import (
@@ -119,7 +119,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
             if ai_response == ERROR_MESSAGE:
                 await reply_error_message(update, context)
-                
+
                 context.user_data["user_choice"] = None  # Очистка выбора
                 context.user_data["model_selected"] = False  # Очистка модели
 
