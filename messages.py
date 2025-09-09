@@ -60,6 +60,6 @@ async def send_loading_message(update: Update, context: ContextTypes.DEFAULT_TYP
                     message_id=loading_message.message_id,
                     text=f"Подожди, думаю... {frame}"
                 )
-                await asyncio.sleep(0.15)
+                await asyncio.sleep(0.20)
             except:
                 break

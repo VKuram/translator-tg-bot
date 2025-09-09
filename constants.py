@@ -8,11 +8,9 @@ load_dotenv()
 
 API_URL = "https://api.together.xyz/v1"
 TOGETHER_API_KEY = os.getenv("TOGETHER_API_KEY")
-AI_MODELS_MAP = {
+AI_MODELS_MAP = {  # @TODO можно добавить и другие
     "DeepSeek": "deepseek-ai/DeepSeek-R1-Distill-Llama-70B-free",
-    # "Meta Vision": "meta-llama/Llama-Vision-Free",
     "Meta 3.3": "meta-llama/Llama-3.3-70B-Instruct-Turbo-Free",
-    "Arcee AFM": "arcee-ai/AFM-4.5B-Preview",
 }
 
 SYSTEM_PROMPT = (
@@ -27,7 +25,8 @@ SYSTEM_PROMPT = (
 ". \n"
 "7. Если пишешь код, то пиши полностью на английском (не используй кириллицу в наименованиях переменных или других "
 "объектов), но дополняй код коментариями на русском. \n"
-"8. Если нужно форматирование текста, то используй метод парсинга Markdown (например, блок кода передавай внутри ```)"
+"8. Перед тем, как отправить ответ, убедись, что в нем нет лжи, перепроверь. \n"
+"9. Если нужно форматирование текста, то используй метод парсинга Markdown (например, блок кода передавай внутри ```)."
 )
 
 END_WORDS = ["</think>"]
